@@ -1,0 +1,100 @@
+===== Persiapan Instalasi =====
+
+- Buat 3 buah VM (Controller, Compute dan Network Node) dengan OS CentOS 7 Minimal pada VMware vSphere
+
+- Gunakan CD Installer CentOS-7-x86_64-Minimal-1503-01.iso. File ISO bisa didownload pada link berikut : http://kambing.ui.ac.id/iso/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Minimal-1503-01.iso
+
+- Minimal kebutuhan RAM dan Harddisk masing-masing VM sebagi berikut :
+
+Contoller Node : 1-2 GB RAM 
+		: 10 GB Harddisk
+
+Compue Node	: 2 GB RAM
+		: 10 GB Harddisk
+
+Network Node	: 512 MB RAM
+		: 10 GB Harddisk
+
+- Konfigurasi kebutuhan NIC masing-masing VM sebagai berikut :
+
+Controller Node : 1 NIC (Manajemen Network
+Compute Node : 2 NIC (Manajemen dan Tunnel Network)
+Network Node : 3 NIC (Manajemen, Tunnel Network dan Public Network)
+
+- Pastikan Promicious Mode Network pada VMware dalam status Accept
+
+- Edit VMX File Compute Node agar support KVM dengan menambahkan parameter berikut :
+
+vhv.enable = “TRUE”
+
+- Jalankan VM dan berikan IP temporer agar dapat diakses via SSH
+
+ip addr add
+
+===== Proses Instalasi dan Konfigurasi =====
+
+- Konfigurasi IP Address permanen via nmtui
+
+== IP Manajemen (Interface 1)
+
+Controller	: 192.168.11.21/24
+Compute		: 192.168.11.22/24
+Network		: 192.168.11.23/24
+Gateway		: 192.168.11.11
+DNS 1		: 192.168.11.11
+DNS 2		: 8.8.8.8
+
+== IP Tunnel (Interface 2)
+
+Compute		: 10.10.10.20/24
+Network		: 10.10.10.30/24
+
+
+- Salin openstack-kilo.tgz pada Controller Node
+
+- Ekstrak openstack-kilo.tgz dan Konfigurasi Repositori
+
+Jalankan script autoconfigure-repositori-ID.sh
+
+- Tunggu hingga selesai dan restart
+
+- SSH kembali pada Controller Node
+
+- Jalankan script auto install openstack
+
+sh autoinstall-openstack-kilo-ID.sh
+
+== Informasi IP Address dan Interface
+
+- Internal Network untuk Instance
+Network		: 172.16.10.0/24
+Gateway		: 172.16.10.254
+
+- Cek Interface External pada Network Node dengan perintah ipaddr. Misalnya eth2
+
+- IP Public/Floating IP untuk komunikasi dengan network luar
+
+Network			: 192.168.200.0/24
+Gateway			: 192.168.200.254
+IP Allocation Awal	: 192.168.200.1
+IP Allocation Akhir	: 192.168.200.253
+
+- Cek Support Processor pada Compute Node
+
+egrep -c ‘(vmx|svm)’ /proc/cpuinfo
+
+Note : Jika perintah diatas hasilnya angka 1 atau lebih, maka Compute node support KVM. Jika 0 (kosong), maka tidak support KVM
+
+
+===== Selesai Instalasi =====
+
+- Testing membuat Instance
+
+- Testing memberikan Floating IP
+
+- Testing open koneksi ICMP
+
+- Testing open koneksi SSH
+
+
+===== Good Luck =====
